@@ -50,6 +50,27 @@ def display_instances(image, boxes, masks, ids, names, scores):
 
     return image
 
+def run_camera(model, class_names):
+    capture = cv2.VideoCapture(0)
+
+    # these 2 lines can be removed if you dont have a 1080p camera.
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+    while True:
+        ret, frame = capture.read()
+        results = model.detect([frame], verbose=0)
+        r = results[0]
+        frame = display_instances(
+            frame, r['rois'], r['masks'], r['class_ids'], class_names, r['scores']
+        )
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    capture.release()
+    cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     """
